@@ -1,0 +1,9 @@
+* iTerm 终端
+** 主题
+   github上有一个iTerm的主题repo,
+   地址: https://github.com/mbadolato/iTerm2-Color-Schemes
+   使用: 将该代码下载到本地文件系统中, 之后运行iterm, 将主题文件导入即可使用
+* 技巧
+** tree命令的一个等价实现
+   find . -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
+   该等价方式的好处是可以显示中文名的文件，但是tree显示中文为乱码
