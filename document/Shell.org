@@ -22,7 +22,6 @@
 ** bash 中的hash命令
    linux命令'hash'管理着一个内置的哈希表, 记录了已执行过的命令的完整路径,
    用该命令可以打印出你所使用过的命令以及执行的次数
-   
 * Better Bash scripting in 15 minutes
   http://blog.jobbole.com/65808/
 ** start every bash script with the following prolog
@@ -99,7 +98,6 @@
    set -o verbose and set -o xtrace to the script prolog.
    This might be useful if the script is run on a remote machine, e.g.
    a build-bot and you are logging the output for remote inspection.
-
 ** Signs you should not be using a bash script
    your script is longer than a few hundred lines of code
    you need data structures beyond simple arrays
@@ -110,3 +108,17 @@
    Instead consider scripting languages like Python or Ruby.
 ** lea data
    http://tldp.org/LDP/abs/html/
+* 后台任务
+** 执行一个后台任务
+   可以在需要执行的命令后加上&即可
+** 通过ctrl+z和bg命令将当前任务切换到后台
+   先使用ctrl+z将当前任务暂停
+   执行bg命令将任务切换到后台执行
+   使用jobs命令查看所有的后台任务   
+** fg命令将后台任务切换到前台
+   fg命令不带参数，则将最近的后台任务切换到前台
+   如果有多个任务，可以先使用jobs命令列出所有任务号和对应命令
+   fg %1将一号任务切换到前台
+** 通过kill %结束指定的后台任务   
+   假如你想杀死指定的后台任务，用kill %任务号就行了。下面是杀死2号任务的例子
+   kill %2
