@@ -122,3 +122,10 @@
 ** 通过kill %结束指定的后台任务   
    假如你想杀死指定的后台任务，用kill %任务号就行了。下面是杀死2号任务的例子
    kill %2
+* Shell 远程操作
+  ssh user@server bash < /path/to/local/script.sh 在server上使用bash执行/path/to/local/script.sh
+  ssh user@server cat /path/to/remote | diff /path/to/localfile -: 比较远程文件和本地文件的差异
+  vim scp://username@host/path/to/somefile： vi一个远程文件
+  curl ifconfig.me：在内网下查看公网ip
+* 其他
+  FUNCNAME: 函数名变量，在函数内打印该变量会输出当前的函数名称
