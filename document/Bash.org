@@ -1,0 +1,25 @@
+* 使用BASH一行行的读文件
+  代码如下：
+  <1>:
+  i=1
+  FILE=sample.txt
+  echo "##"
+  cat $FILE | while read line; do
+  echo "LINE # $i: $line"
+  ((i++))
+  done
+  echo "total number of lines in file: $i"
+  <1>代码的问题在于：使用管道命令会发起子shell来读取文件，而任何在子shell中的操作
+  都会随着子shell的结束而丢失。
+  <2>:
+  for fileline in $(cat $FILE); do
+  echo $fileline
+  done
+  <2>的问题在于：for循环默认使用IFS的值来分割,IFS的默认值为空格
+  <3>:
+  k=1
+  while read line; do
+  echo "LINE # $k: $line"
+  ((k++))
+  done < $FILE
+  <3>的代码是标准代码，可以一行行很好的读取文件
