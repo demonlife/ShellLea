@@ -22,4 +22,67 @@
   echo "LINE # $k: $line"
   ((k++))
   done < $FILE
+  该代码等价于：
+  k=1
+  < $FILE while read -r line; do
+  echo "LINE #$k: $line"
+  ((k++))
+  done
+  但是可能会存在问题：You can't put it in the front because you must put redirections
+  at the end of a compound command. You can put them anywhere in a simple command.
+  Also it should always be echo "$line" not echo $line because of word splitting
+  happening if you don't quote it. I don't get your comment about awk being bogus
   <3>的代码是标准代码，可以一行行很好的读取文件
+* Bash One-Liners
+  http://www.catonmat.net/blog/bash-one-liners-explained-part-one/
+  echo "hello" -n >> file :向file文件追加内容，去掉换行符号
+  read -r line < file :获取文件file的第一行数据,-r:makes sure the input is read raw,
+  meaning the backslashes won't get escaped
+  line=$(head -1 file): 同上
+  line=`head -1 file`: 同上，反引号
+
+  shuf不是bash的内建命令
+  read -r random_line < <(shuf file): 随机读取file文件中的一行， When bash sees <(shuf file)
+  it opens a special file /dev/fd/n, where n is a free file descriptor,
+  then runs shuf file with its stdout connected to /dev/fd/n and replaces <(shuf file)
+  with /dev/fd/n
+
+  sort -R命令是对文件随机排序
+  <(...):是进程替换操作符，进程替换操作会创建一个匿名的管道文件，并将进程命令的标准输出连接到管道的写一端
+  read -r random_line < <(sort -R file) :随机获取文件file的一行数据
+  read -r random_line <<(sort -R file): 同上
+  random_line=$(sort -R file | head -1): 同上
+  
+  while read -r field1 field2 throwaway; do
+  echo $field1, $field2
+  done
+  其中throwaway会存取后面的所有的内容，thorwaway可以使用_替换, 此时就不能访问了, 其实可以理解为
+  最后一个变量会存储所有剩下的数据。
+
+  here-string：
+  which lets you pass strings directly to the standard input of commands
+  info="20 packets in 10 seconds"
+  read packets _ _ time _ <<< "$info"
+  
+  快速复制一个文件：
+  cp /path/to/file{, _copy}
+  快速重命名一个文件：
+  mv /path/to/file{,_copy}
+
+  获取文件名/文件路径：
+  pathname=/path/to/file.txt
+  filename=${pathname##*/}
+  dirname=${pathname%/*}
+  ##/%/#/%%应该单独处理，后面的内容是匹配的正则表达式。
+
+  echo {a..z} :产生字母表
+  printf "%c" {a..z}: 产生字母表中间无空格
+* Bash 学习
+  http://wiki.ubuntu.com.cn/Shell%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80
+  var=1
+  let "var+=1": let表示数学运算
+  var="$[$var+1]": $[]将中括号内的内容作为数学运算结果再输出。
+  ((var++)): var的值加1
+  var=$(($var+1)): 计算var的值
+  
+  
