@@ -84,5 +84,8 @@
   var="$[$var+1]": $[]将中括号内的内容作为数学运算结果再输出。
   ((var++)): var的值加1
   var=$(($var+1)): 计算var的值
-  
+* BASH 保护性编程技巧 
+  http://blog.jobbole.com/73257/
+  尽量少用全局变量， 并且以大写命名， 只读声明， 用全局变量代替隐晦的$0, $1等
+  例如： readonly PROGNAME=$(basename $0)
   
