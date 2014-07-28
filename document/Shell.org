@@ -129,3 +129,129 @@
   curl ifconfig.me：在内网下查看公网ip
 * 其他
   FUNCNAME: 函数名变量，在函数内打印该变量会输出当前的函数名称
+* sed 学习
+  http://www.ituring.com.cn/article/118056
+  http://coolshell.cn/articles/9104.html
+** pattern space
+   是一个 sed 负责维护的缓冲区，当应用编辑命令时在那里存储单个输入行，并依次执行每一个命令，
+   当应用了所有命令后，当前行被输出并把 file(s) 的下一行读入，循环往复。pattern space 中的内容是动态的，
+   任何命令都可以为应用下一个命令而改变 pattern space 的内容。一些命令会改变 sed 的工作流程
+** hold space
+** 命令格式
+   sed [options] 'program' files(s)
+   sed [options] -f sed_script file(s)
+*** 命令格式详情
+    address{
+    program1
+    program2
+    ...
+    }
+    address2{
+    program3
+    program4
+    ...
+    }
+    [address1,[address2]][!]program1/program2/.../
+    需要将program顶到一行的开头写，否则会出现错误
+    address不是必须要指定的，不指定就会在每一行上执行sed_script
+    address 后紧跟!匹配非address的行。
+    ===== address 详细说明
+    number：只匹配特定行
+    first~step:匹配已first行起始，step会递增量的address，如果first为0，sed就会以为从第step行递增。gnu扩展
+    $：匹配文件最后一行
+    /regexp/：正则匹配, \<表示词首, abc\>表示以abc结尾的词
+    \cregexpc：同上c可以为任意字符, 在命令中如果需要使用',则不能在''中转义',因此只能使用双引号,在双引号内可以转义"。
+    0，addr2：从files第1行开始，直到匹配到addr2的行，相当于1，addr2。区别是0，addr2会在地址区间结尾，
+    1，addr2会在地址区间的起始，只有当addr2是一个正则表达式才有效。(使用0会报错, sed版本是gnu sed 4.2.2 代码如下：
+    0, 3{
+    s;yes;no;
+    }
+    )
+    addr1,+N：匹配从addr1行开始，直到下面的N行
+    addr1, ~N：匹配从addr1开始，直到为N的倍数行(？通过测试为等价于：1,N)
+    ===== options 详细说明
+    -n, -- quite, --slient：阻止默认输出，通常和p一起使用，只输出pattern space中改变的行
+    -e 'program', --expression='program': 如果有多个program可以指定多个-e选项
+    -f sed_script, --files=sed_script
+    --follow-symlinks: 处理符号链接
+    -i[SUFFIX], --in-place=[SUFFIX]：对file进行更改，如果提供了suffix，则先对源文件进行备份
+    -l N, --line-length=N:指定自动换行的字符数
+    --posix:禁用所有的gnu sed扩展
+    -r,--regexp-extend:使用ere，posix只能使用bre
+    -s，--separate:将files视为单个独立的文件，而不是将他们视为连续的字符流。
+    -u，--unbuffered，从files中加载尽可能少量的数据并且更频繁的flush
+**** 命令
+     [address[,address2]]s/pattern/replacement/flag
+     用replacement替代每一个寻址行的pattern
+     flag(通常组合使用)
+     n：1~512的一个数字，表示对匹配模式的每行中第n次出现的情况进行替换,默认为第一次
+     g：全局替换
+     p：打印pattern space内容
+     w file：将pattern space的内容写入到文件file中。
+     replacement：
+     &：用正则表达式匹配的内容进行替换
+     \n：匹配第n个分组子串
+     \：转义符号，也可以创建多行replacement字符串
+     sed会记住最后一个正则表达式，
+     sed 's/foo/bar/3' #替换第3个foo
+     sed 's//quux/' #替换第一个foo
+     #：注释命令
+     d：删除命令， [address1[,address2]]d
+     D：多行删除命令， [address1[,address2]]D
+     a：追加命令, [address1[,address2]]a
+     i：插入命令，[address1[,address2]]i
+     c：更改命令，[address2[,address2]]c
+     l：列表命令,[address1[,address2]]l,列出space pattern中的内容， 将不可打印字符表示为ascii码，长的将被折行
+     l width：列表命令，gnu扩展，同上，长的行以width规定的字符数折行。
+     y：转换命令，[address1[,address2]]y/abc/xyz:按位置将字符串abc中的字符转换成字符串xyz的相应位置
+     替换根据字符的位置来进行。该替换没有‘词’的概念，只要遇到一个符合的字符就进行替换。
+     p：打印命令，会导致重复的输出，指定-n option则可以避免重复输出
+     =:打印行号
+     n：首先输出patter space的内容，然后读取下一行，继续执行sed_script中余下的program
+*** 标签命令(:lable)
+    [address]b[mylable]
+    如果没有指定mylable，则跳转到sed_script结尾，否则无条件跳转到mylable处
+    :top
+    cmd1
+    cmd2
+    /pattern/b top
+    cmd3
+** 知识点
+   sed处理文本的伪代码
+   foreach line in file {
+   patter_space <= line # 将每一行放入patter space中
+   patter_space <= exec(sed_cmd, patter_space) # 处理patter space中的行，然后继续放入patter space中
+
+   # 如果没有指定-n，则打印改行
+   if (sed option hasn't "-n") {
+   print patter_space
+   }
+*** address
+    几乎所有的命令格式是
+    [address[,address]][!]{cmd}
+    address可以是一个数字，也可以是一个模式，可以通过逗号分隔两个address
+    执行cmd的伪代码如下：
+    bool bexec = false
+    foreach line in file {
+    if (match(address1)) {
+    bexec = true
+    }
+    if (bexec == true) {
+    exec(sed_cmd)
+    }
+    if (match(address2)) {
+    bexec = false;
+    }
+    }
+    address可以使用相对位置
+    sed '/dog/, +3s/^/# /g' #在dog的连续3行进行操作
+*** 命令打包
+    cmd可以是多个，可以用分号分开，可以用大括号括起来作为嵌套命令
+    sed '3, 6 {/this/{/fish/d}}' pets.txt #对3,6行，匹配this成功后在匹配fish,成功后执行d命令
+*** hold space
+    g: 将hold space的内容拷贝到patter space，原来patter space的内容清除
+    G: 将hold space的内容append到patter space\n后
+    h:将patter space的内容拷贝到hold space中，清除原hold space的内容
+    H:将patter space的内容append到hold space\n后
+    x:交换pattern space和hold space的内容
+    
