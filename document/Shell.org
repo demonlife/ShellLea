@@ -310,7 +310,7 @@
     awk -v val=$x '{print $1, $4+val, $5+ENVIRON["y"]}' OFS="\t" filename
 *** 几个小技巧
     awk 'length>80' file #从file中找出长度大于80的行
-    
-    
 * grep 命令
   grep --exclude-dir=/path:查找时排除某个路径
+* shell 入门
+  http://wiki.ubuntu.com.cn/Shell%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80
