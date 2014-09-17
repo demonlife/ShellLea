@@ -314,3 +314,5 @@
   grep --exclude-dir=/path:查找时排除某个路径
 * Find 命令
   find . -empty: 查找空文件
+* shell 入门
+  http://wiki.ubuntu.com.cn/Shell%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80
